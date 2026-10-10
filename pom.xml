@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -36,10 +36,23 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>3.1.1</version>
+		</dependency>
+
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webmvc-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>3.1.1</version>
+		</dependency>
+
 
 		<!-- ================================================================
              WEEK 1 - ACTIVITY 2
@@ -58,3 +71,313 @@
 	</build>
 
 </project>
+
+
+<dependency>
+<groupId>org.springdoc</groupId>
+<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+<version>3.1.1</version>
+</dependency>
+
+<dependencies> section with this:
+
+
+<dependencies>
+
+	<!-- Spring Boot Web -->
+	<dependency>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-webmvc</artifactId>
+	</dependency>
+
+	<!-- Swagger UI -->
+	<dependency>
+		<groupId>org.springdoc</groupId>
+		<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+		<version>3.1.1</version>
+	</dependency>
+
+	<!-- Spring Boot Testing -->
+	<dependency>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-webmvc-test</artifactId>
+		<scope>test</scope>
+	</dependency>
+
+</dependencies>
+
+Everything else in your pom.xml can stay as it is.
+
+What to do next
+Save pom.xml using Ctrl + S.
+
+Right-click pom.xml → Maven → Sync Project.
+
+Stop the running Spring Boot application.
+
+Run ProductsApiApplication.java again.
+
+Open http://localhost:8080/swagger-ui/index.html.
+
+If it works, you should see the Swagger interface with your API endpoints.
+
+Note: Removing the duplicate fixes the Maven configuration warning, but it may not resolve the earlier 404 by itself.
+
+If you're still getting a 404, tell me whether http://localhost:8080/customers/1 works. That will help us narrow down the issue.
+
+yes it works but in swagger i still ge he error
+Great! Since http://localhost:8080/customers/1 works, your Spring Boot application and CustomerController are working correctly. ✅
+
+The remaining issue is specifically with Swagger UI.
+
+Step 1 – Try these URLs
+Open each URL separately:
+
+http://localhost:8080/swagger-ui/index.html
+
+http://localhost:8080/swagger-ui.html
+
+http://localhost:8080/v3/api-docs
+
+Step 2 – Check what happens
+The third URL is especially important:
+
+JSON appears: OpenAPI documentation is working, so the problem may be with Swagger UI.
+
+404 Not Found: Springdoc's documentation endpoint isn't being registered.
+
+500 Internal Server Error: Springdoc is running into an application or compatibility error.
+
+Step 3 – Check Maven
+In IntelliJ IDEA, open the Maven panel and expand Dependencies.
+
+Look for:
+
+org.springdoc:springdoc-openapi-starter-webmvc-ui:3.1.1
+
+If it isn't there, reload your Maven project.
+
+Don't change your Java classes or add another Swagger dependency yet.
+
+Tell me what you see at this URL:
+
+http://localhost:8080/v3/api-docs
+
+
+JSON data appears
+
+404 – Whitelabel Error Page
+
+500 – Internal Server Error
+
+Something else
+Once we know this result, we can focus on the actual Swagger problem without changing your working Customer API.
+
+still the same issue
+Since /customers/1 works but Swagger UI still gives a 404 error, your Java controllers are working. We need to fix the Swagger configuration.
+
+Let's try one targeted fix.
+
+Step 1 – Add Swagger paths to application.properties
+In IntelliJ, open:
+
+src/main/resources/application.properties
+
+Add these lines:
+
+springdoc.api-docs.enabled=true
+springdoc.swagger-ui.enabled=true
+springdoc.api-docs.path=/v3/api-docs
+springdoc.swagger-ui.path=/swagger-ui.html
+These settings explicitly enable the documentation endpoints. They won't fix a missing or incompatible dependency, but they're useful to check.
+
+Step 2 – Reload and restart
+Save the file.
+
+Open Maven and click Reload All Maven Projects.
+
+Stop Spring Boot completely.
+
+Run ProductsApiApplication.java again.
+
+Step 3 – Test
+Open:
+
+http://localhost:8080/swagger-ui/index.html
+
+Then:
+
+http://localhost:8080/v3/api-docs
+
+Step 4 – If it still shows 404
+We need to inspect the actual startup logs rather than keep changing configuration.
+
+In IntelliJ, open the Run console and copy the output from when Spring Boot starts, especially any ERROR, WARN, or springdoc messages.
+
+Send me that console output. I'll use it to identify why Swagger isn't being registered in your Spring Boot 4.1.1 application.
+
+You can continue Tutorial 2 Activity 5 using /customers/1 in the meantime, because that endpoint is already working.
+
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>4.1.1</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>uk.ac.westminster</groupId>
+	<artifactId>products-api</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name/>
+	<description/>
+	<url/>
+	<licenses>
+		<license/>
+	</licenses>
+	<developers>
+		<developer/>
+	</developers>
+	<scm>
+		<connection/>
+		<developerConnection/>
+		<tag/>
+		<url/>
+	</scm>
+	<properties>
+		<java.version>25</java.version>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webmvc</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>3.1.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webmvc-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>3.1.1</version>
+		</dependency>
+
+
+		<!-- ================================================================
+             WEEK 1 - ACTIVITY 2
+             Add the springdoc-openapi dependency below this comment block.
+             The exact <dependency> block is given in the Week 1 lab guide.
+             ================================================================ -->
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
+…
+I found the problem in your pom.xml: you still have the Swagger dependency added twice.
+
+You only need one copy of springdoc-openapi-starter-webmvc-ui.
+
+1. Replace your entire pom.xml with this
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>4.1.1</version>
+		<relativePath/>
+	</parent>
+
+	<groupId>uk.ac.westminster</groupId>
+	<artifactId>products-api</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+
+	<name>products-api</name>
+	<description>OOP Tutorial Spring Boot Application</description>
+
+	<properties>
+		<java.version>25</java.version>
+	</properties>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webmvc</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>3.1.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webmvc-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
+
+2. Reload Maven and restart
+Press Ctrl + S to save.
+
+In IntelliJ, open the Maven panel.
+
+Click Reload All Maven Projects.
+
+Wait for dependencies to finish loading.
+
+Stop Spring Boot and run ProductsApiApplication.java again.
+
+3. Test Swagger
+Try these URLs:
+
+http://localhost:8080/swagger-ui/index.html
+
+http://localhost:8080/v3/api-docs
+
+Important: The duplicate dependency is a configuration mistake, but removing it does not guarantee that Swagger's 404 will disappear.
+
+If both URLs still return 404, please send me a screenshot of the IntelliJ Run console after restarting the application. Your /customers/1 endpoint already works, so we need to determine why Springdoc's endpoints aren't loading rather than change your Java classes.
+
+
+
+
